@@ -1,0 +1,19 @@
+{
+  "name": "teach-global-app",
+  "version": "1.0.0",
+  "description": "The Teach Global App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AsafAaronson/TeachGlobalApp.git"
+  },
+  "author": "Asaf Aaronson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AsafAaronson/TeachGlobalApp/issues"
+  },
+  "homepage": "https://github.com/AsafAaronson/TeachGlobalApp#readme"
+}
