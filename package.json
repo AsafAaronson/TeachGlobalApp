@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/AsafAaronson/TeachGlobalApp/issues"
   },
-  "homepage": "https://github.com/AsafAaronson/TeachGlobalApp#readme"
+  "homepage": "https://github.com/AsafAaronson/TeachGlobalApp#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
 }
