@@ -17,6 +17,10 @@
   },
   "homepage": "https://github.com/AsafAaronson/TeachGlobalApp#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "config": "^3.3.2",
+    "express": "^4.17.1",
+    "mongoose": "^5.10.7",
+    "winston": "^2.4.0",
+    "winston-mongodb": "^3.0.2"
   }
 }
