@@ -2,10 +2,10 @@ const express = require('express');
 const config = require('config');
 const winston = require('winston');
 
-const app = express();
-require('./startup/routes')(app)
 
 require('./startup/logging')();
+const app = express();
+require('./startup/routes')(app)
 
 require('./startup/config')();
 //Connect to DB

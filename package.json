@@ -17,8 +17,13 @@
   },
   "homepage": "https://github.com/AsafAaronson/TeachGlobalApp#readme",
   "dependencies": {
+    "bcrypt": "^5.0.0",
     "config": "^3.3.2",
     "express": "^4.17.1",
+    "joi": "^17.2.1",
+    "joi-objectid": "^3.0.1",
+    "joi-password-complexity": "^4.2.1",
+    "lodash": "^4.17.20",
     "mongoose": "^5.10.7",
     "winston": "^2.4.0",
     "winston-mongodb": "^3.0.2"
