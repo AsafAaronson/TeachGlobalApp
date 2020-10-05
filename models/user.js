@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
-const PasswordComplexity = require('joi-password-complexity');
+const jwt = require('jsonwebtoken');
+const config = require('config');
+
+
 const photoUrlMini =
     'https://i.picsum.photos/id/168/50/50.jpg?hmac=RtAs7F6AeB1rYq86K_eM7a8_clT6Vyd8KCJS4Tp5W3A';
 const photoUrl =
@@ -31,6 +34,14 @@ const userSchema = new mongoose.Schema({
     workpages: { type: Array, default: [] },
 });
 
+userSchema.methods.generateAuthToken = function () {
+    const token = jwt.sign(
+        { _id: this._id, isAdmin: this.isAdmin },
+        config.get("jwtPrivateKey")
+    );
+    return token;
+};
+
 const User = new mongoose.model('User', userSchema);
 
 const validateUser = (user) => {
@@ -48,18 +59,7 @@ const validateUser = (user) => {
     return scheme.validate(user);
 };
 
-// const validatePassword = (password) => {
-//     const complexityOptions = {
-//         min: 6,
-//         max: 30,
-//         lowerCase: 1,
-//         upperCase: 1,
-//         numeric: 1,
-//         requirementCount: 3,
-//     };
 
-//     return PasswordComplexity(complexityOptions,"---Password---").validate(password)
-// }
 
 module.exports.User = User;
 module.exports.validate = validateUser;

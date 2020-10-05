@@ -27,7 +27,6 @@ router.post(
         );
         if (user.error) {
             res.status(400).send(user.error.details[0].message);
-            throw user.error;
         }
 
         user = await User.findOne({ email: req.body.email });
