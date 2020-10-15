@@ -7,7 +7,7 @@ const { User } = require('../models/user');
 const router = express.Router();
 
 router.post(
-    '/',
+    '/', 
     asyncHandle(async (req, res) => {
         let login = validate(req.body);
         if (login.error)
@@ -25,6 +25,13 @@ router.post(
 
         const token = user.generateAuthToken();
         res.header('x-auth-token', token).send('Login completed');
+    })
+);
+
+router.post(
+    '/logout',
+    asyncHandle(async (req, res) => {
+        res.header('x-auth-token', '').send('Logout completed');
     })
 );
 

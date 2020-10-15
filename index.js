@@ -4,8 +4,11 @@ const winston = require('winston');
 
 
 require('./startup/logging')();
+
 const app = express();
 require('./startup/routes')(app)
+
+require('./startup/validation')();
 
 require('./startup/config')();
 //Connect to DB

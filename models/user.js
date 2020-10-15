@@ -31,7 +31,11 @@ const userSchema = new mongoose.Schema({
         default: photoUrl,
     },
     activities: { type: Array, default: [] },
+    activitiesLiked: { type: Array, default: [] },
+    activitiesDone: { type: Array, default: [] },
     workpages: { type: Array, default: [] },
+    workpagesLiked: { type: Array, default: [] },
+    workpagesDone: { type: Array, default: [] },
 });
 
 userSchema.methods.generateAuthToken = function () {

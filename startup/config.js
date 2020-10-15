@@ -10,4 +10,7 @@ module.exports = function () {
     if (!config.get("logFilePath")) {
         throw new Error("Fatal Error: logFilePath is not defined (configuration)");
     }
+    if (!config.get("port")) {
+        throw new Error("Fatal Error: port is not defined (configuration)");
+    }
 }
