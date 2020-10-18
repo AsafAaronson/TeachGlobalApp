@@ -13,4 +13,7 @@ module.exports = function () {
     if (!config.get("port")) {
         throw new Error("Fatal Error: port is not defined (configuration)");
     }
+    if (!config.get("cardBatchSize")) {
+        throw new Error("Fatal Error: cardBatchSize is not defined (configuration)");
+    }
 }

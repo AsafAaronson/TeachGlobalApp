@@ -1,28 +1,39 @@
 const express = require('express');
-const Fawn = require('fawn');
 const mongoose = require('mongoose');
+const Fawn = require('fawn');
+const config = require('config');
 const asyncHandle = require('../middlware/asyncHandle');
 const auth = require('../middlware/auth');
 const adminAuth = require('../middlware/adminAuth');
 const { Activity, validate } = require('../models/activity');
 const { User } = require('../models/user');
+const { getSortMode, getCriteria } = require('../utils/cardBatch');
 
 const router = express.Router();
 Fawn.init(mongoose);
 
-// get cards
+// get cards (query: sortmode (0-3), searchWords [], batchesPresent (0-))
 router.get(
-    '/',
+    '/cards',
     auth,
     asyncHandle(async (req, res) => {
-        let sortBy = [{likes: 1},{datePublished:1}]
-        let activities = await Activity.find({}).limit(10).select({
-            title: 1,
-            description: 1,
-            tags: 1,
-            datePublished: 1,
-            likes: 1,
-        });
+        const sortMode = getSortMode(req.query.sortMode);
+        const criteria = getCriteria(req.query.searchWords);
+        const batchSize = config.get('cardBatchSize');
+        const toSkip = req.query.batchesPresent * batchSize;
+
+        let activities = await Activity.find(criteria)
+            .skip(toSkip)
+            .sort(sortMode)
+            .limit(batchSize)
+            .select({
+                title: 1,
+                description: 1,
+                tags: 1,
+                datePublished: 1,
+                likes: 1,
+                _id: 1,
+            });
         res.status(200).send(activities);
     })
 );
