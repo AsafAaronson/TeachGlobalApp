@@ -5,12 +5,12 @@ const config = require('config');
 const asyncHandle = require('../middlware/asyncHandle');
 const auth = require('../middlware/auth');
 const adminAuth = require('../middlware/adminAuth');
-const { Activity, validate } = require('../models/activity');
+const { Workpage, validate } = require('../models/workpage');
 const { User } = require('../models/user');
 const { getSortMode, getCriteria } = require('../utils/cardBatch');
 
 const router = express.Router();
-Fawn.init(mongoose);
+Fawn.init(mongoose, 'OJLINTTASKCOLLECTION 2');
 
 // get cards (query: sortmode (0-3), searchWords [], batchesPresent (0-))
 router.get(
@@ -22,7 +22,7 @@ router.get(
         const batchSize = config.get('cardBatchSize');
         const toSkip = req.query.batchesPresent * batchSize;
 
-        let activities = await Activity.find(criteria)
+        let workpages = await Workpage.find(criteria)
             .skip(toSkip)
             .sort(sortMode)
             .limit(batchSize)
@@ -33,20 +33,21 @@ router.get(
                 datePublished: 1,
                 likes: 1,
                 _id: 1,
+                photos: 1,
             });
-        res.status(200).send(activities);
+        res.status(200).send(workpages);
     })
 );
-// get activity
+//get workpage
 router.get(
     '/:id',
     auth,
     asyncHandle(async (req, res) => {
-        const activity = await Activity.find({ _id: req.params.id });
-        res.send(activity)
+        const workpage = await Workpage.find({ _id: req.params.id });
+        res.send(workpage);
     })
 );
-// create new activity
+//create new workpage
 router.post(
     '/',
     [auth, adminAuth],
@@ -61,18 +62,25 @@ router.post(
                 .status(400)
                 .send(`User not found by this Author id: ${req.body.author}`);
 
-        activity = new Activity(req.body);
+        const workpage = new Workpage({
+            title: req.body.title,
+            description: req.body.description,
+            tags: req.body.tags,
+            author: req.body.author,
+            cardPhotoUrl: req.body.photos[0],
+            photos: req.body.photos,
+        })
 
         const task = Fawn.Task();
         task.update(
             User,
             { _id: req.body.author },
-            { $push: { activities: activity._id } }
+            { $push: { workpages: workpage._id } }
         )
-            .save('activities', activity)
+            .save('workpages', workpage)
             .run({ useMongoose: true });
 
-        res.send(`Activity Created: ${activity.title}`);
+        res.send(`Workpage Created: ${workpage.title}`);
     })
 );
 
