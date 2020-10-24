@@ -43,7 +43,7 @@ router.get(
     auth,
     asyncHandle(async (req, res) => {
         const activity = await Activity.find({ _id: req.params.id });
-        res.send(activity)
+        res.send(activity);
     })
 );
 // create new activity
@@ -55,7 +55,7 @@ router.post(
         if (activity.error)
             return res.status(400).send(activity.error.details[0].message);
 
-        author = await User.findOne({ _id: req.body.author }); 
+        author = await User.findOne({ _id: req.body.author });
         if (!author)
             return res
                 .status(400)
@@ -75,5 +75,61 @@ router.post(
         res.send(`Activity Created: ${activity.title}`);
     })
 );
-
+//toggle like on an activity
+router.post(
+    '/like/:id',
+    auth,
+    asyncHandle(async (req, res) => {
+        const user = await User.findOne({ _id: req.user._id });
+        const task = Fawn.Task();
+        if (user.activitiesLiked.includes(req.params.id)) {
+            task.update(
+                User,
+                { _id: req.user._id },
+                { $pull: { activitiesLiked: req.params.id } }
+            );
+            task.update(
+                Activity,
+                { _id: req.params.id },
+                { $inc: { likes: -1 } }
+            );
+            task.run({ useMongoose: true });
+            res.send(`Activity Unliked: ${req.params.id}`);
+        } else {
+            task.update(
+                User,
+                { _id: req.user._id },
+                { $push: { activitiesLiked: req.params.id } }
+            );
+            task.update(
+                Activity,
+                { _id: req.params.id },
+                { $inc: { likes: 1 } }
+            );
+            task.run({ useMongoose: true });
+            res.send(`Activity Liked: ${req.params.id}`);
+        }
+    })
+);
+//toggle Done on an activity
+router.post(
+    '/done/:id',
+    auth,
+    asyncHandle(async (req, res) => {
+        const user = await User.findOne({ _id: req.user._id });
+        if (user.activitiesDone.includes(req.params.id)) {
+            await User.updateOne(
+                { _id: req.user._id },
+                { $pull: { activitiesDone: req.params.id } }
+            );
+            res.send(`Activity marked as Undone: ${req.params.id}`);
+        } else {
+            await User.updateOne(
+                { _id: req.user._id },
+                { $push: { activitiesDone: req.params.id } }
+            );
+            res.send(`Activity marked as Done: ${req.params.id}`);
+        }
+    })
+);
 module.exports = router;
