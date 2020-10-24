@@ -5,7 +5,7 @@ const config = require('config');
 const asyncHandle = require('../middlware/asyncHandle');
 const auth = require('../middlware/auth');
 const adminAuth = require('../middlware/adminAuth');
-const { Activity, validate } = require('../models/activity');
+const { Activity, validate, updateValidate } = require('../models/activity');
 const { User } = require('../models/user');
 const { getSortMode, getCriteria } = require('../utils/cardBatch');
 
@@ -46,35 +46,7 @@ router.get(
         res.send(activity);
     })
 );
-// create new activity
-router.post(
-    '/',
-    [auth, adminAuth],
-    asyncHandle(async (req, res) => {
-        let activity = validate(req.body);
-        if (activity.error)
-            return res.status(400).send(activity.error.details[0].message);
 
-        author = await User.findOne({ _id: req.body.author });
-        if (!author)
-            return res
-                .status(400)
-                .send(`User not found by this Author id: ${req.body.author}`);
-
-        activity = new Activity(req.body);
-
-        const task = Fawn.Task();
-        task.update(
-            User,
-            { _id: req.body.author },
-            { $push: { activities: activity._id } }
-        )
-            .save('activities', activity)
-            .run({ useMongoose: true });
-
-        res.send(`Activity Created: ${activity.title}`);
-    })
-);
 //toggle like on an activity
 router.post(
     '/like/:id',
@@ -130,6 +102,58 @@ router.post(
             );
             res.send(`Activity marked as Done: ${req.params.id}`);
         }
+    })
+);
+// create new activity
+router.post(
+    '/',
+    [auth, adminAuth],
+    asyncHandle(async (req, res) => {
+        let activity = validate(req.body);
+        if (activity.error)
+            return res.status(400).send(activity.error.details[0].message);
+
+        author = await User.findOne({ _id: req.body.author });
+        if (!author)
+            return res
+                .status(400)
+                .send(`User not found by this Author id: ${req.body.author}`);
+
+        activity = new Activity(req.body);
+
+        const task = Fawn.Task();
+        task.update(
+            User,
+            { _id: req.body.author },
+            { $push: { activities: activity._id } }
+        )
+            .save('activities', activity)
+            .run({ useMongoose: true });
+
+        res.send(`Activity Created: ${activity.title}`);
+    })
+);
+//update Activity
+router.put(
+    '/:id',
+    [auth, adminAuth],
+    asyncHandle(async (req, res) => {
+        let activity = updateValidate(req.body);
+        if (activity.error)
+            return res.status(400).send(activity.error.details[0].message);
+
+        if (req.body.author) {
+            author = await User.findOne({ _id: req.body.author });
+            if (!author)
+                return res
+                    .status(400)
+                    .send(
+                        `User not found by this Author id: ${req.body.author}`
+                    );
+        }
+
+        await Activity.updateOne({ _id: req.params.id }, { $set: req.body });
+        res.send(`Activity updated: ${req.params.id}`);
     })
 );
 module.exports = router;

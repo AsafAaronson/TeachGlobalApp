@@ -47,42 +47,6 @@ router.get(
         res.send(workpage);
     })
 );
-//create new workpage
-router.post(
-    '/',
-    [auth, adminAuth],
-    asyncHandle(async (req, res) => {
-        let workpage = validate(req.body);
-        if (workpage.error)
-            return res.status(400).send(workpage.error.details[0].message);
-
-        author = await User.findOne({ _id: req.body.author }); 
-        if (!author)
-            return res
-                .status(400)
-                .send(`User not found by this Author id: ${req.body.author}`);
-
-        workpage = new Workpage({
-            title: req.body.title,
-            description: req.body.description,
-            tags: req.body.tags,
-            author: req.body.author,
-            cardPhotoUrl: req.body.photos[0],
-            photos: req.body.photos,
-        })
-
-        const task = Fawn.Task();
-        task.update(
-            User,
-            { _id: req.body.author },
-            { $push: { workpages: workpage._id } }
-        )
-            .save('workpages', workpage)
-            .run({ useMongoose: true });
-
-        res.send(`Workpage Created: ${workpage.title}`);
-    })
-);
 //toggle like on a workpage
 router.post(
     '/like/:id',
@@ -138,6 +102,65 @@ router.post(
             );
             res.send(`Workpage marked as Done: ${req.params.id}`);
         }
+    })
+);
+//create new workpage
+router.post(
+    '/',
+    [auth, adminAuth],
+    asyncHandle(async (req, res) => {
+        let workpage = validate(req.body);
+        if (workpage.error)
+            return res.status(400).send(workpage.error.details[0].message);
+
+        author = await User.findOne({ _id: req.body.author }); 
+        if (!author)
+            return res
+                .status(400)
+                .send(`User not found by this Author id: ${req.body.author}`);
+
+        workpage = new Workpage({
+            title: req.body.title,
+            description: req.body.description,
+            tags: req.body.tags,
+            author: req.body.author,
+            cardPhotoUrl: req.body.photos[0],
+            photos: req.body.photos,
+        })
+
+        const task = Fawn.Task();
+        task.update(
+            User,
+            { _id: req.body.author },
+            { $push: { workpages: workpage._id } }
+        )
+            .save('workpages', workpage)
+            .run({ useMongoose: true });
+
+        res.send(`Workpage Created: ${workpage.title}`);
+    })
+);
+//update workpage
+router.put(
+    '/:id',
+    [auth, adminAuth],
+    asyncHandle(async (req, res) => {
+        let workpage = updateValidate(req.body);
+        if (workpage.error)
+            return res.status(400).send(workpage.error.details[0].message);
+
+        if (req.body.author) {
+            author = await User.findOne({ _id: req.body.author });
+            if (!author)
+                return res
+                    .status(400)
+                    .send(
+                        `User not found by this Author id: ${req.body.author}`
+                    );
+        }
+
+        await Workpage.updateOne({ _id: req.params.id }, { $set: req.body });
+        res.send(`Workpage updated: ${req.params.id}`);
     })
 );
 

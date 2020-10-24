@@ -34,5 +34,18 @@ const validateWorkpage = (activity) => {
     return scheme.validate(activity);
 };
 
+const updateValidateWorkpage = (activity) => {
+    const scheme = Joi.object({
+        title: Joi.string().max(24).min(2),
+        description: Joi.string().max(255).min(2),
+        tags: Joi.array().max(20).min(1),
+        author: Joi.objectId(),
+        photos: Joi.array().max(20).min(1),
+    });
+
+    return scheme.validate(activity);
+};
+
 module.exports.Workpage = Workpage;
 module.exports.validate = validateWorkpage;
+module.exports.updateValidate = updateValidateWorkpage;
