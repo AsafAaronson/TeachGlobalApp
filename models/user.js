@@ -3,7 +3,6 @@ const Joi = require('joi');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 
-
 const photoUrlMini =
     'https://i.picsum.photos/id/168/50/50.jpg?hmac=RtAs7F6AeB1rYq86K_eM7a8_clT6Vyd8KCJS4Tp5W3A';
 const photoUrl =
@@ -41,7 +40,7 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.generateAuthToken = function () {
     const token = jwt.sign(
         { _id: this._id, isAdmin: this.isAdmin },
-        config.get("jwtPrivateKey")
+        config.get('jwtPrivateKey')
     );
     return token;
 };
@@ -63,7 +62,21 @@ const validateUser = (user) => {
     return scheme.validate(user);
 };
 
+const updateValidateUser = (user) => {
+    const scheme = Joi.object({
+        name: Joi.string().max(255).min(5),
+        password: Joi.string().min(6).max(30),
+        repeatPassword: Joi.ref('password'),
+        hideEmail: Joi.boolean(),
+        contactInfo: Joi.string().max(1024),
+        photoUrl: Joi.string().max(1024),
+        photoUrlMini: Joi.string().max(1024),
+        isAdmin: Joi.boolean(),
+    }).with('password', 'repeatPassword');
 
+    return scheme.validate(user);
+};
 
 module.exports.User = User;
 module.exports.validate = validateUser;
+module.exports.updateValidate = updateValidateUser;

@@ -1,3 +1,4 @@
 node_modules/
 config/default.json
 logFile.log
+http-tests/

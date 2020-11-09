@@ -7,7 +7,7 @@ const { User } = require('../models/user');
 const router = express.Router();
 
 router.post(
-    '/', 
+    '/',
     asyncHandle(async (req, res) => {
         let login = validate(req.body);
         if (login.error)
@@ -23,8 +23,10 @@ router.post(
         if (!validPassword)
             return res.status(400).send('Invalid email or password');
 
-        const token = user.generateAuthToken();
-        res.header('x-auth-token', token).send('Login completed');
+        const token = await user.generateAuthToken();
+        res.cookie('access_token', token, { maxAge: 3600, httpOnly: true });
+        res.status(200).end();
+        // res.header('x-auth-token', token).send('Login completed');
     })
 );
 

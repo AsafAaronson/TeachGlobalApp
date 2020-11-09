@@ -12,7 +12,7 @@ module.exports = function () {
     });
     winston.add(winston.transports.MongoDB, {
         db: dbPath,
-        level: 'info',
+        level: 'http',
     });
 
     winston.handleExceptions([

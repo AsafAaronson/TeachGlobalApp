@@ -16,4 +16,7 @@ module.exports = function () {
     if (!config.get("cardBatchSize")) {
         throw new Error("Fatal Error: cardBatchSize is not defined (configuration)");
     }
+    if (!config.get("frontendOrigin")) {
+        throw new Error("Fatal Error: frontend Origin is not defined (configuration)");
+    }
 }
