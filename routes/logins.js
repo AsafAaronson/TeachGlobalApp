@@ -25,15 +25,15 @@ router.post(
 
         const token = await user.generateAuthToken();
         res.cookie('access_token', token, { maxAge: 3600, httpOnly: true });
-        res.status(200).end();
-        // res.header('x-auth-token', token).send('Login completed');
+        res.status(200).send('Login Completed').end();
     })
 );
 
 router.post(
     '/logout',
     asyncHandle(async (req, res) => {
-        res.header('x-auth-token', '').send('Logout completed');
+        res.cookie('access_token', '');
+        res.status(200).send('Logout completed');
     })
 );
 
