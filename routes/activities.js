@@ -37,6 +37,9 @@ router.get(
         res.status(200).send(activities);
     })
 );
+
+// get liked/ Done cards ****** TO DO *******
+
 // get activity
 router.get(
     '/:id',
